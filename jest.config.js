@@ -6,8 +6,7 @@
 module.exports = {
   preset: 'react-native',
   moduleFileExtensions: ['js', 'json', 'jsx', 'ts', 'tsx', 'node'],
-  setupFilesAfterEnv: ['../jest.setup.js'],
-  testPathIgnorePatterns: ['node_modules'],
+  setupFilesAfterEnv: ['./jest.setup.js'],
   // All imported modules in your tests should be mocked automatically
   // automock: false,
 
@@ -118,7 +117,7 @@ module.exports = {
   // restoreMocks: false,
 
   // The root directory that Jest should scan for tests and modules within
-  rootDir: './demo',
+  // rootDir: "<rootDir>",
 
   // A list of paths to directories that Jest should use to search for files in
   // roots: [
@@ -156,9 +155,9 @@ module.exports = {
   // ],
 
   // An array of regexp pattern strings that are matched against all test paths, matched tests are skipped
-  // testPathIgnorePatterns: [
-  //   "/node_modules/"
-  // ],
+  testPathIgnorePatterns: [
+    "/node_modules/"
+  ],
 
   // The regexp pattern or array of patterns that Jest uses to detect test files
   // testRegex: [],
@@ -176,13 +175,12 @@ module.exports = {
   // timers: "real",
 
   // A map from regular expressions to paths to transformers
-  // transform: undefined,
+  transformIgnorePatterns: [
+    'node_modules/(?!react-native|react-native-svg/|@react-native-community/blur/|tuya-panel-theme)',
+  ],
 
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
-  // transformIgnorePatterns: [
-  //   "/node_modules/",
-  //   "\\.pnp\\.[^\\/]+$"
-  // ],
+  
 
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
   // unmockedModulePathPatterns: undefined,

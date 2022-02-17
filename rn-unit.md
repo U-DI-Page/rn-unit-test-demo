@@ -11,6 +11,7 @@ Jest 优点：
 
 Jest 常用命令：
 * 初始化配置 `jest --init`  
+* 指定目录 `jest --verbose ./src/slideChoose`
 
 Matchers:
 在使用 matchers 时要注意 toBe 是使用 Object.is 判断是否相等，如果是对象或者数组类型要用 toEqual。也可以反着测试 用 not.toBe 测试相反的结果。
@@ -63,7 +64,7 @@ ___
 ___
 #### 三种方式对比，shallow 浅层渲染，不会触发 useEffect 或者生命周期函数 componentDidMount/componentDidUpdate, 但是可以触发constructor和render。 mount 都可以触发
 ____
-## 测试情景 一
+## 情景 一
 
 ### 如何模拟测试外部组件库
 ```javascript
@@ -122,3 +123,54 @@ ____
     });
   });
 ```
+
+## 情景 二
+### 如何测试 PanResponder 手势相关api
+
+## 情景 三
+### 如何测试
+
+## 原理篇
+### 如何实现测试块
+测试块其实并不复杂，最简单的实现不过如下，我们需要把测试包装实际测试的回调函数存起来，所以封装一个 dispatch 方法接收命令类型和回调函数：
+```javascript
+  const test = (name, fn) => {
+    dispatch({ type: "ADD_TEST", fn, name });
+  };
+```
+我们需要在全局创建一个 state 保存测试的回调函数，测试的回调函数使用一个数组存起来
+```javascript
+  global["STATE_SYMBOL"] = {
+    testBlock: [],
+  };
+```
+dispatch 方法此时只需要甄别对应的命令，并把测试的回调函数存进全局的 state 即可
+```javascript
+  const dispatch = (event) => {
+    const { fn, type, name } = event;
+    switch (type) {
+      case "ADD_TEST":
+        const { testBlock } = global["STATE_SYMBOL"];
+        testBlock.push({ fn, name });
+        break;
+    }
+  };
+```
+### 如何实现断言和匹配器
+断言库也实现也很简单，只需要封装一个函数暴露匹配器方法满足以下公式即可
+```javascript
+  expect(A).toBe(B);
+```
+这里我们实现 toBe 这个常用的方法，当结果和预期不相等，抛出错误即可
+```javascript
+  const expect = (actual) => ({
+      toBe(expected) {
+          if (actual !== expected) {
+              throw new Error(`${actual} is not equal to ${expected}`);
+          }
+      }
+  };
+```
+实际在测试块中会使用 try/catch 捕获错误，并打印堆栈信息方面定位问题。
+
+在简单情况下，我们也可以使用 Node 自带的 assert 模块进行断言，当然还有很多更复杂的断言方法，本质上原理都差不多
